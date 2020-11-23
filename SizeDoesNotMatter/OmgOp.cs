@@ -47,7 +47,11 @@ namespace SizeDoesNotMatter {
 		}
 
 		public static OmgNum Multiply( OmgNum left, OmgNum right ) {
-			throw new NotImplementedException();
+			if( left.IsNegative == right.IsNegative ) {
+				return _Positive(m_multiplier.Multiply(left.Raw, right.Raw));
+			}
+
+			return _Negative(m_multiplier.Multiply(left.Raw, right.Raw));
 		}
 
 		public static OmgNum Multiply (OmgNum left, OmgNum right, OmgNum mod) {
@@ -73,10 +77,22 @@ namespace SizeDoesNotMatter {
 			res.mod.Release();
 
 			return (divModded, modModded);
-		} 
+		}
 
-		public static OmgNum Pow( OmgNum left, OmgNum right, OmgNum mod = null ) {
-			throw new NotImplementedException();
+		public static OmgNum Pow (OmgNum left, OmgNum right) {
+			bool evenPower = (right.Raw.Digits[0] & 1) == 0;
+			if( evenPower || !left.IsNegative) {
+				return _Positive(m_multiplier.Pow(left.Raw, right.Raw));
+			}
+
+			return _Negative(m_multiplier.Pow(left.Raw, right.Raw));
+		}
+
+		public static OmgNum Pow( OmgNum left, OmgNum right, OmgNum mod ) {
+			OmgNum moddedLeft = Mod(left, mod);
+			OmgNum moddedPow = _Positive(m_multiplier.Pow(left.Raw, right.Raw, mod.Raw));
+			moddedLeft.Release();
+			return moddedPow;
 		}
 
 		public static bool Equal (OmgNum left, OmgNum right) {
