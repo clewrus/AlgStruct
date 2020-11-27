@@ -20,7 +20,10 @@ namespace SizeDoesNotMatter {
 
 			UInt32 absNum = (UInt32)Math.Abs(number);
 			rawNumber.Digits.Add((UInt16)(absNum & ((1 << 16) - 1)));
-			rawNumber.Digits.Add((UInt16)(absNum >> 16));
+
+			if((absNum >> 16) > 0) {
+				rawNumber.Digits.Add((UInt16)(absNum >> 16));
+			}
 
 			return result;
 		}

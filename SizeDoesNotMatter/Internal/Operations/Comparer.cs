@@ -12,8 +12,8 @@ namespace SizeDoesNotMatter.Internal.Operations {
 				return sizeDif > 0;
 			}
 
-			for( int i = 0; i < left.Size; i++ ) {
-				UInt32 diff = right.Digits[i] - left.Digits[i];
+			for( int i = left.Size - 1; i >= 0; i-- ) {
+				Int32 diff = (Int32)right.Digits[i] - (Int32)left.Digits[i];
 				if( diff != 0 ) {
 					return diff > 0;
 				}
@@ -29,8 +29,7 @@ namespace SizeDoesNotMatter.Internal.Operations {
 			}
 
 			for (int i = 0; i < left.Size; i++) {
-				UInt32 diff = right.Digits[i] - left.Digits[i];
-				if (diff != 0) {
+				if (right.Digits[i] != left.Digits[i]) {
 					return false;
 				}
 			}

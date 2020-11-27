@@ -11,6 +11,8 @@ namespace SizeDoesNotMatter {
 		private static Subtracter m_subtracter = new Subtracter();
 		private static Divider m_divider = new Divider();
 		private static Multiplier m_multiplier = new Multiplier();
+		private static Rooter m_rooter = new Rooter();
+		private static Gcder m_gcder = new Gcder();
 
 
 		public static OmgNum Add( OmgNum left, OmgNum right ) {
@@ -95,6 +97,35 @@ namespace SizeDoesNotMatter {
 			return moddedPow;
 		}
 
+		public static OmgNum Sqrt( OmgNum left ) {
+			if( left.IsZero() ) {
+				return OmgPool.GetZero();
+			}
+
+			if( left.IsNegative ) {
+				throw new OmgFailException("can't square root negative number");
+			}
+
+			return _Positive(m_rooter.Sqrt(left.Raw));
+		}
+
+		public static OmgNum Gcd( OmgNum left, OmgNum right ) {
+			return _Positive(m_gcder.FindGcd(left.Raw, right.Raw));
+		}
+
+		public static bool TryInverseByMod( OmgNum left, OmgNum mod, out OmgNum inverce ) {
+			RawNum gcd = m_gcder.ExtendedGcd(left.Raw, mod.Raw, out OmgNum x, out OmgNum y);
+			y.Release();
+
+			bool result = (gcd.Size == 1) && (gcd.Digits[0] == 1);
+			OmgPool.ReleaseNumber(gcd);
+
+			inverce = (result) ? Mod(x, mod) : null;
+			x.Release();
+
+			return result;
+		}
+
 		public static bool Equal (OmgNum left, OmgNum right) {
 			if( left.IsNegative != right.IsNegative ) {
 				return left.IsZero() && right.IsZero();
@@ -130,7 +161,6 @@ namespace SizeDoesNotMatter {
 		}
 
 
-
 		private static OmgNum _Positive( RawNum raw ) {
 			var result = new OmgNum(raw);
 			result.IsNegative = false;
@@ -155,7 +185,7 @@ namespace SizeDoesNotMatter {
 			OmgNum resModded = Mod(res, mod);
 			res.Release();
 
-			return res;
+			return resModded;
 		}
 
 		private static T _WithModded<T>( OmgNum left, OmgNum right, OmgNum mod, Func<OmgNum, OmgNum, T> func ) {

@@ -61,7 +61,7 @@ namespace SizeDoesNotMatter.Internal.Operations {
 					OmgNum powSquare = OmgOp.Multiply(m_powRes, m_powRes);
 					m_powRes.Release();
 					m_powRes = powSquare;
-					_DivByTwo(m_rightCopy);
+					m_rightCopy.DivByTwo();
 				} else {
 					OmgNum powPlusOne = OmgOp.Multiply(m_powRes, left);
 					m_powRes.Release();
@@ -83,7 +83,7 @@ namespace SizeDoesNotMatter.Internal.Operations {
 
 					m_powRes = powSquareModded;
 
-					_DivByTwo(m_rightCopy);
+					m_rightCopy.DivByTwo();
 				} else {
 					OmgNum powPlusOne = OmgOp.Multiply(m_powRes, left);
 					OmgNum powPlusOneModded = OmgOp.Mod(powPlusOne, mod);
@@ -141,21 +141,10 @@ namespace SizeDoesNotMatter.Internal.Operations {
 			for (int i = 0; i < num.Size && z > 0; i++) {
 				UInt32 bitVal = ((1 << 16) | num.Digits[i]) - z;
 				z = (~bitVal & (1 << 16)) >> 16;
+				num.Digits[i] = bitVal & UInt16.MaxValue;
 			}
 
 			if (num.Digits[num.Size - 1] == 0) {
-				num.Digits.RemoveAt(num.Size - 1);
-			}
-		}
-
-		private void _DivByTwo( RawNum num ) {
-			UInt32 leadingBit = 0;
-			for(int i = num.Size - 1; i >= 0; i--) {
-				UInt32 bitVal = num.Digits[i];
-				num.Digits[i] = (leadingBit << 15) | (bitVal >> 1);
-				leadingBit = bitVal & 1;
-			}
-			if(num.Digits[num.Size - 1] == 0) {
 				num.Digits.RemoveAt(num.Size - 1);
 			}
 		}

@@ -135,7 +135,7 @@ namespace SizeDoesNotMatter.Internal.Operations {
 				UInt32 tested = (upper + down) >> 1;
 				_MultiplyByDigit(right, tested, m_buffer);
 
-				if( _ModLessThan( m_buffer, strictly: false ) ) {
+				if( _ModLessThan( m_buffer, strictly: true ) ) {
 					upper = tested - 1;
 				} else {
 					answer = tested;

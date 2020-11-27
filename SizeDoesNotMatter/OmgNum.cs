@@ -11,6 +11,7 @@ namespace SizeDoesNotMatter {
 		internal bool IsNegative { get; set; }
 		internal RawNum Raw { get; private set; }
 		public bool IsValid => Raw != null;
+		public int Size => Raw.Size;
 
 		static OmgNum() {
 			m_converter = new BaseConverter<UInt32>();
@@ -24,6 +25,12 @@ namespace SizeDoesNotMatter {
 			this.Raw = raw;
 		}
 
+		public OmgNum( OmgNum other ) {
+			this.Raw = OmgPool.GetRawZero();
+			this.Raw.CopyFrom(other.Raw);
+			this.IsNegative = other.IsNegative;
+		}
+
 		public void Release() {
 			OmgPool.ReleaseNumber(Raw);
 			Raw = null;
@@ -31,6 +38,27 @@ namespace SizeDoesNotMatter {
 
 		public bool IsZero() {
 			return Raw.IsZero();
+		}
+
+		public bool IsOne() {
+			return Raw.Size == 1 && Raw.Digits[0] == 1;
+		}
+
+		public override bool Equals (object obj) {
+			if( !(obj is OmgNum other) ) {
+				return false;
+			}
+
+			return OmgOp.Equal(this, other);
+		}
+
+		public override int GetHashCode () {
+			UInt32 res = 0;
+			foreach( var d in Raw.Digits ) {
+				res ^= d;
+			}
+
+			return (int)res;
 		}
 
 		#region ToString
