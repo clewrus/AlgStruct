@@ -36,6 +36,26 @@ namespace SizeDoesNotMatter {
 			Raw = null;
 		}
 
+		public OmgNum MakeAbs() {
+			IsNegative = false;
+			return this;
+		}
+
+		public OmgNum MultByTwo () {
+			Raw.MultByTwo();
+			return this;
+		}
+
+		public OmgNum DivByTwo() {
+			Raw.DivByTwo();
+			return this;
+		}
+
+		public OmgNum Inc() {
+			Raw.Inc();
+			return this;
+		}
+
 		public bool IsZero() {
 			return Raw.IsZero();
 		}

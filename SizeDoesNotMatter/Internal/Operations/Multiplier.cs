@@ -22,6 +22,9 @@ namespace SizeDoesNotMatter.Internal.Operations {
 			}
 
 			_MakeMult(left, right);
+			while( m_multRaw.Size > 0 && m_multRaw.Digits[m_multRaw.Size - 1] == 0 ) {
+				m_multRaw.Digits.RemoveAt(m_multRaw.Size - 1);
+			}
 
 			return m_multRaw;
 		}
@@ -38,63 +41,81 @@ namespace SizeDoesNotMatter.Internal.Operations {
 				return m_powRes.Raw;
 			}
 
-			m_powRes.Raw.CopyFrom(left);
-
-			m_rightCopy = OmgPool.GetRawZero();
-			m_rightCopy.CopyFrom(right);
-			_SubOne(m_rightCopy);
-
 			if( mod == null ) {
-				_MakeFastPow(new OmgNum(left));
+				return _MakeFastPow(new OmgNum(left), right).Raw;
 			} else {
-				_MakeFastPow(new OmgNum(left), new OmgNum(mod));
-			}
-
-			OmgPool.ReleaseNumber(m_rightCopy);
-			return m_powRes.Raw;
-		}
-
-		private void _MakeFastPow( OmgNum left ) {
-			while (m_rightCopy.Size > 0) {
-				bool even = (m_rightCopy.Digits[0] & 1) == 0;
-				if( even ) {
-					OmgNum powSquare = OmgOp.Multiply(m_powRes, m_powRes);
-					m_powRes.Release();
-					m_powRes = powSquare;
-					m_rightCopy.DivByTwo();
-				} else {
-					OmgNum powPlusOne = OmgOp.Multiply(m_powRes, left);
-					m_powRes.Release();
-					m_powRes = powPlusOne;
-					_SubOne(m_rightCopy);
-				}
+				return _MakeFastPow(new OmgNum(left), right, new OmgNum(mod)).Raw;
 			}
 		}
 
-		private void _MakeFastPow (OmgNum left, OmgNum mod) {
-			while (m_rightCopy.Size > 0) {
-				bool even = (m_rightCopy.Digits[0] & 1) == 0;
-				if (even) {
-					OmgNum powSquare = OmgOp.Multiply(m_powRes, m_powRes);
-					OmgNum powSquareModded = OmgOp.Mod(powSquare, mod);
+		private OmgNum _MakeFastPow( OmgNum left, RawNum right ) {
+			if (right.IsZero()) {
+				var res = OmgPool.GetRawZero();
+				res.Digits.Add(1);
+				return new OmgNum(res);
+			}
 
-					powSquare.Release();
-					m_powRes.Release();
+			var rightCopy = OmgPool.GetRawZero();
+			rightCopy.CopyFrom(right);
 
-					m_powRes = powSquareModded;
+			bool even = (rightCopy.Digits[0] & 1) == 0;
+			if (even) {
+				rightCopy.DivByTwo();
+				var p = _MakeFastPow(left, rightCopy);
 
-					m_rightCopy.DivByTwo();
-				} else {
-					OmgNum powPlusOne = OmgOp.Multiply(m_powRes, left);
-					OmgNum powPlusOneModded = OmgOp.Mod(powPlusOne, mod);
+				OmgNum powSquare = OmgOp.Multiply(p, p);
+				p.Release();
 
-					powPlusOne.Release();
-					m_powRes.Release();
+				OmgPool.ReleaseNumber(rightCopy);
+				return powSquare;
+			} else {
+				_SubOne(rightCopy);
+				var p = _MakeFastPow(left, rightCopy);
 
-					m_powRes = powPlusOneModded;
+				OmgNum powPlusOne = OmgOp.Multiply(p, left);
+				p.Release();
 
-					_SubOne(m_rightCopy);
-				}
+				OmgPool.ReleaseNumber(rightCopy);
+				return powPlusOne;
+			}
+		}
+
+		private OmgNum _MakeFastPow (OmgNum left, RawNum right, OmgNum mod) {
+
+			if(right.IsZero() ) {
+				var res = OmgPool.GetRawZero();
+				res.Digits.Add(1);
+				return new OmgNum(res);
+			}
+
+			var rightCopy = OmgPool.GetRawZero();
+			rightCopy.CopyFrom(right);
+
+			bool even = (rightCopy.Digits[0] & 1) == 0;
+			if (even) {
+				rightCopy.DivByTwo();
+				var p = _MakeFastPow(left, rightCopy, mod);
+
+				OmgNum powSquare = OmgOp.Multiply(p, p);
+				OmgNum powSquareModded = OmgOp.Mod(powSquare, mod);
+
+				powSquare.Release();
+				p.Release();
+
+				OmgPool.ReleaseNumber(rightCopy);
+				return powSquareModded;
+			} else {
+				_SubOne(rightCopy);
+				var p = _MakeFastPow(left, rightCopy, mod);
+
+				OmgNum powPlusOne = OmgOp.Multiply(p, left);
+				OmgNum powPlusOneModded = OmgOp.Mod(powPlusOne, mod);
+
+				powPlusOne.Release();
+				p.Release();
+
+				OmgPool.ReleaseNumber(rightCopy);
+				return powPlusOneModded;
 			}
 		}
 

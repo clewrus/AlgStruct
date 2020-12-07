@@ -43,6 +43,11 @@ namespace SizeDoesNotMatter {
 			return result;
 		}
 
+		public static OmgNum Copy(this OmgNum num) {
+			var copy = new OmgNum(num);
+			return copy;
+		}
+
 		#region Private
 
 		private static bool StartsWithMinus(string str) {

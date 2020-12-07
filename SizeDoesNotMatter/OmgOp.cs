@@ -13,6 +13,7 @@ namespace SizeDoesNotMatter {
 		private static Multiplier m_multiplier = new Multiplier();
 		private static Rooter m_rooter = new Rooter();
 		private static Gcder m_gcder = new Gcder();
+		private static Randomizer m_randomizer = new Randomizer();
 
 
 		public static OmgNum Add( OmgNum left, OmgNum right ) {
@@ -124,6 +125,15 @@ namespace SizeDoesNotMatter {
 			x.Release();
 
 			return result;
+		}
+
+		public static OmgNum Random( OmgNum min, OmgNum max ) {
+			if (Less(max, min)) throw new OmgFailException("Max must be greater than min");
+			if( !min.IsNegative && !max.IsNegative ) {
+				return _Positive(m_randomizer.GetRandom(min.Raw, max.Raw));
+			}
+
+			throw new NotImplementedException();
 		}
 
 		public static bool Equal (OmgNum left, OmgNum right) {
