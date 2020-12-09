@@ -128,7 +128,7 @@ namespace SizeDoesNotMatter {
 		}
 
 		public static OmgNum Random( OmgNum min, OmgNum max ) {
-			if (Less(max, min)) throw new OmgFailException("Max must be greater than min");
+			if (Less(max, min)) { return min.Copy();  }
 			if( !min.IsNegative && !max.IsNegative ) {
 				return _Positive(m_randomizer.GetRandom(min.Raw, max.Raw));
 			}

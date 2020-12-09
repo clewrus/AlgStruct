@@ -1,6 +1,7 @@
 ﻿using System;
 using SizeDoesNotMatter;
 using Lab2.Algorithms;
+using System.Linq;
 
 namespace Lab2 {
 	class Program {
@@ -13,7 +14,8 @@ namespace Lab2 {
 			var primesProd = OmgOp.Multiply(primeA, primeB);
 
 			var polard = new PolardFactorization();
-			//var factor = polard.FindFactor(primesProd);
+			var factor = polard.FindFactor(primesProd);
+			Console.WriteLine($"factor: {factor}");
 
 			// Rho Discrete Log
 
@@ -24,6 +26,24 @@ namespace Lab2 {
 
 			Console.WriteLine($"{discreteLog} : {OmgOp.Pow(log.a, discreteLog, log.p)}");
 
+			// Factorization
+
+			var factorizer = new Factorization();
+			var factorization = factorizer.Factorize("43212354346700".ToOmgNum());
+
+			Console.WriteLine($"factorization: {String.Join(' ', factorization.Select(x => ($"{x.Key}^{x.Value}")))}");
+			// EulerF
+
+			var euler = factorizer.EulerFunction("96".ToOmgNum());
+			Console.WriteLine($"euler: {euler}");
+
+			// MobiusF
+
+			var mobius1 = factorizer.Mobius("32809742394".ToOmgNum());
+			var mobius2 = factorizer.Mobius("4".ToOmgNum());
+
+			Console.WriteLine($"mobius1: {mobius1}");
+			Console.WriteLine($"mobius2: {mobius2}");
 		}
 	}
 }

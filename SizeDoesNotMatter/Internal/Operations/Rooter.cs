@@ -20,7 +20,22 @@ namespace SizeDoesNotMatter.Internal.Operations {
 			_FillInitialApproximation();
 
 			while( !_AproxEqualToBuffer() ) {
+				var aproxCopy = OmgPool.GetRawZero();
+				aproxCopy.CopyFrom(m_rootAprox);
+
+				var bufferCopy = OmgPool.GetRawZero();
+				bufferCopy.CopyFrom(m_buffer);
+
 				_MakeGeronIteration();
+
+				if( OmgOp.Equal(aproxCopy.OmgWrapper(), m_buffer.OmgWrapper()) &&
+					OmgOp.Equal(bufferCopy.OmgWrapper(), m_rootAprox.OmgWrapper()) &&
+					OmgOp.Less( m_rootAprox.OmgWrapper(), m_buffer.OmgWrapper())) { 
+					break;
+				}
+
+				OmgPool.ReleaseNumber(bufferCopy);
+				OmgPool.ReleaseNumber(aproxCopy);
 			}
 
 			OmgPool.ReleaseNumber(m_buffer);

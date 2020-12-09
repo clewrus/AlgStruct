@@ -8,7 +8,10 @@ namespace Lab2.Algorithms {
 	public class PolardFactorization {
 		private OmgNum m_current;
 
-		public OmgNum FindFactor( OmgNum n ) {
+		private int m_iterations;
+		public OmgNum FindFactor (OmgNum n, int maxIterations = -1 ) {
+			m_iterations = 0;
+
 			m_current = n;
 
 			OmgNum x = OmgOp.Random(1.ToOmgNum(), OmgOp.Subtract(n, 2.ToOmgNum()));
@@ -22,6 +25,10 @@ namespace Lab2.Algorithms {
 			sub.Release();
 
 			while( gcd.IsOne() ) {
+				if( maxIterations >= 0 && m_iterations++ > maxIterations ) {
+					return null;
+				}
+
 				if( OmgOp.Equal(i, stage) ) {
 					y.Release();
 					y = new OmgNum(x);

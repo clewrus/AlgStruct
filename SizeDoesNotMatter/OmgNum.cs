@@ -8,7 +8,7 @@ namespace SizeDoesNotMatter {
 		private static BaseConverter<UInt32> m_converter;
 		private static StringBuilder m_stringRepresentation;
 
-		internal bool IsNegative { get; set; }
+		public bool IsNegative { get; internal set; }
 		internal RawNum Raw { get; private set; }
 		public bool IsValid => Raw != null;
 		public int Size => Raw.Size;
@@ -84,6 +84,9 @@ namespace SizeDoesNotMatter {
 		#region ToString
 
 		public override string ToString () {
+			if( IsZero() ) {
+				return "0";
+			}
 			return ToString(10);
 		}
 
