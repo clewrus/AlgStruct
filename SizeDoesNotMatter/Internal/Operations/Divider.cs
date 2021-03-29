@@ -4,6 +4,8 @@ using System.Text;
 
 namespace SizeDoesNotMatter.Internal.Operations {
 	internal class Divider {
+		private static readonly OmgNum s_two = 2.ToOmgNum();
+
 		private OmgNum m_divRes;
 		private OmgNum m_modRes;
 
@@ -16,13 +18,19 @@ namespace SizeDoesNotMatter.Internal.Operations {
 
 		public (OmgNum div, OmgNum mod) DivMod( OmgNum left, OmgNum right ) {
 			_InitializeDivModResult();
+
+			if( OmgOp.Equal( right, s_two ) ) {
+				_DivModByTwo(left);
+				return (m_divRes, m_modRes);
+			}
+
 			bool isNegative = left.IsNegative != right.IsNegative;
 			m_divRes.IsNegative = isNegative;
 
 			_FindDivModSolution( left.Raw, right.Raw );
 
 			if(isNegative) {
-				_Incriment(m_divRaw);
+				m_divRaw.Inc();
 				_Subtract(right.Raw, m_modRaw);
 			}
 
@@ -42,6 +50,16 @@ namespace SizeDoesNotMatter.Internal.Operations {
 
 			_RemoveModLeadingZeros();
 			return m_modRes;
+		}
+
+		private void _DivModByTwo( OmgNum num ) {
+			var rawNum = num.Raw;
+			if( !rawNum.IsZero() && ((rawNum.Digits[0] & 1) == 1) ) {
+				m_modRaw.Digits.Add(1);
+			}
+
+			m_divRaw.CopyFrom(rawNum);
+			m_divRaw.DivByTwo();
 		}
 
 		private void _FindDivModSolution( RawNum left, RawNum right ) {
@@ -213,19 +231,6 @@ namespace SizeDoesNotMatter.Internal.Operations {
 				zeroSuffix++;
 			}
 			m_modRaw.Digits.RemoveRange(m_modRaw.Size - zeroSuffix, zeroSuffix);
-		}
-
-		private void _Incriment( RawNum num ) {
-			UInt32 overfit = 1;
-			for( int i = 0; i < num.Size && overfit > 0; i++ ) {
-				UInt32 incRes = num.Digits[i] + overfit;
-				num.Digits[i] = incRes & UInt16.MaxValue;
-				overfit = incRes >> 16;
-			}
-
-			if(overfit > 0) {
-				num.Digits.Add(1);
-			}
 		}
 
 		private void _Subtract( RawNum left, RawNum right ) {

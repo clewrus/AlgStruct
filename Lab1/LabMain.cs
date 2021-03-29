@@ -25,10 +25,7 @@ namespace Lab1 {
 			bool success1 = sys1.TrySolve(out List<(OmgNum root, OmgNum mod)> solution1);
 
 			var sys2 = new OmgEqSys();
-			sys2.AddEq(7, 1, 9);
-			sys2.AddEq(3, 12, 14);
-			sys2.AddEq(1, 1, 15);
-			sys2.AddEq(7, 12, 20);
+
 
 			bool success2 = sys2.TrySolve(out var solution2);
 		}

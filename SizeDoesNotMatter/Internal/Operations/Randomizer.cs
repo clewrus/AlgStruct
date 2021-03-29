@@ -11,6 +11,23 @@ namespace SizeDoesNotMatter.Internal.Operations {
 			m_rand = new Random();
 		}
 
+		internal RawNum GenerateWithBitlength( int bitLength ) {
+			m_result = OmgPool.GetRawZero();
+
+			int intermediateDigits = bitLength / 16;
+			for (int i = 0; i < intermediateDigits; i++) {
+				m_result.Digits.Add((UInt32)m_rand.Next(1 << 16));
+			}
+
+			int restBits = bitLength % 16;
+			if( restBits > 0 ) {
+				m_result.Digits.Add((UInt32)m_rand.Next(1 << restBits));
+			}
+
+			m_result.RemoveLeadingZeros();
+			return m_result;
+		}
+
 		internal RawNum GetRandom( RawNum min, RawNum max ) {
 			m_result = OmgPool.GetRawZero();
 
@@ -19,7 +36,11 @@ namespace SizeDoesNotMatter.Internal.Operations {
 
 			for( int i = max.Size - 1; i >= 0; i-- ) {
 				int digMin = (minComplete || i >= min.Size) ? 0 : (int)min.Digits[i];
-				int digMax = (maxComplete) ? (1 << 16) : ((int)max.Digits[i] + 1);
+				int digMax = (maxComplete) ? (1 << 16) : (int)max.Digits[i];
+
+				if( maxComplete || i != 0 ) {
+					digMax += 1;
+				}
 
 				UInt16 generated = (UInt16)m_rand.Next(digMin, digMax);
 				m_result.Digits.Add(generated);
@@ -29,9 +50,7 @@ namespace SizeDoesNotMatter.Internal.Operations {
 			}
 
 			m_result.Digits.Reverse();
-			while(m_result.Size > 0 && m_result.Digits[m_result.Size - 1] == 0) {
-				m_result.Digits.RemoveAt(m_result.Size - 1);
-			}
+			m_result.RemoveLeadingZeros();
 
 			return m_result;
 		}

@@ -15,9 +15,7 @@ namespace SizeDoesNotMatter.Internal {
 				num.Digits[i] = (leadingBit << 15) | (bitVal >> 1);
 				leadingBit = bitVal & 1;
 			}
-			if (num.Digits[num.Size - 1] == 0) {
-				num.Digits.RemoveAt(num.Size - 1);
-			}
+			num.RemoveLeadingZeros();
 		}
 
 		internal static void MultByTwo (this RawNum num) {
@@ -45,6 +43,26 @@ namespace SizeDoesNotMatter.Internal {
 			}
 			if( overfit > 0 ) {
 				num.Digits.Add(overfit);
+			}
+		}
+
+		internal static void Dec (this RawNum num) {
+			const UInt32 leadingBit = (1 << 16);
+			UInt32 z = 1;
+
+			for (int i = 0; i < num.Size && z > 0; i++) {
+				UInt32 sub = (leadingBit | num.Digits[i]) - z;
+				num.Digits[i] = sub & UInt16.MaxValue;
+
+				z = (~sub & leadingBit) >> 16;
+			}
+
+			num.RemoveLeadingZeros();
+		}
+
+		internal static void RemoveLeadingZeros (this RawNum num) {
+			while( num.Size > 0 && num.Digits[num.Size - 1] == 0 ) {
+				num.Digits.RemoveAt(num.Size - 1);
 			}
 		}
 	}

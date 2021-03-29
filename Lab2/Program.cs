@@ -29,17 +29,17 @@ namespace Lab2 {
 			// Factorization
 
 			var factorizer = new Factorization();
-			var factorization = factorizer.Factorize("43212354346700".ToOmgNum());
+			var factorization = factorizer.Factorize("63782453".ToOmgNum());
 
 			Console.WriteLine($"factorization: {String.Join(' ', factorization.Select(x => ($"{x.Key}^{x.Value}")))}");
 			// EulerF
 
-			var euler = factorizer.EulerFunction("96".ToOmgNum());
+			var euler = factorizer.EulerFunction("63782453".ToOmgNum());
 			Console.WriteLine($"euler: {euler}");
 
 			// MobiusF
 
-			var mobius1 = factorizer.Mobius("32809742394".ToOmgNum());
+			var mobius1 = factorizer.Mobius("63782453".ToOmgNum());
 			var mobius2 = factorizer.Mobius("4".ToOmgNum());
 
 			Console.WriteLine($"mobius1: {mobius1}");

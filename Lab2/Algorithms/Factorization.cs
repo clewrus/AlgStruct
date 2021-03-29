@@ -6,7 +6,7 @@ using System.Text;
 
 namespace Lab2.Algorithms {
 	public class Factorization {
-		private readonly int[] smallPrimes = { 2, 3, 5, 7, 11, 13, 17, 19 };
+		private readonly int[] smallPrimes = { 2, 3, 5, 7, 11, 13, 17, 19, 1033663387 };
 		private OmgNum[] smallPrimesOmg = null;
 		private PolardFactorization m_polard = new PolardFactorization();
 

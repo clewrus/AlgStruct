@@ -16,6 +16,7 @@ namespace SizeDoesNotMatter.Internal {
 		}
 
 		internal static void ReleaseNumber( RawNum number ) {
+			if( number == null ) { return; }
 			number.Digits.Clear();
 			m_availableNumbers.Push(number);
 		}

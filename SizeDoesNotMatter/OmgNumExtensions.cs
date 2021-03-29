@@ -14,8 +14,11 @@ namespace SizeDoesNotMatter {
 
 		public static OmgNum ToOmgNum(this int number) {
 			OmgNum result = OmgPool.GetZero();
-			RawNum rawNumber = result.Raw;
+			if( number == 0 ) {
+				return result;
+			}
 
+			RawNum rawNumber = result.Raw;
 			result.IsNegative = number < 0;
 
 			UInt32 absNum = (UInt32)Math.Abs(number);
@@ -77,8 +80,48 @@ namespace SizeDoesNotMatter {
 			}
 		}
 
+		public static byte[] ToByteArray (this OmgNum num) {
+			if (num.IsZero()) {
+				return new byte[1];
+			}
 
+			var byteList = new List<byte>();
+			for (int i = 0; i < num.Size; i++) {
+				UInt32 digit = num.Raw.Digits[i];
+				byteList.Add((byte)(digit & ((1 << 8) - 1)));
+				digit >>= 8;
+				byteList.Add((byte)(digit & ((1 << 8) - 1)));
+			}
 
+			while (byteList.Count > 0 && byteList[byteList.Count - 1] == 0) {
+				byteList.RemoveAt(byteList.Count - 1);
+			}
+
+			byteList.Add((num.IsNegative) ? (byte)1 : (byte)0);
+			return byteList.ToArray();
+		}
+
+		public static string EncodeToBase64 (this OmgNum num) {
+			var bytes = num.ToByteArray();
+			return Convert.ToBase64String(bytes);
+		}
+
+		public static OmgNum DecodeFromBase64( this string strNum ) {
+			byte[] bytes = Convert.FromBase64String(strNum);
+
+			RawNum num = OmgPool.GetRawZero();
+
+			for( int i = 0; i < bytes.Length - 1; i += 2 ) {
+				byte least = bytes[i];
+				byte elder = (i + 1 < bytes.Length - 1) ? bytes[i + 1] : (byte)0;
+				num.Digits.Add((UInt32)(least | elder << 8));
+			}
+
+			OmgNum decoded = new OmgNum(num);
+			decoded.IsNegative = bytes[bytes.Length - 1] > 0;
+
+			return decoded;
+		}
 
 		#endregion
 	}

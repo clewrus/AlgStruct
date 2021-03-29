@@ -8,6 +8,8 @@ namespace SizeDoesNotMatter {
 		private static BaseConverter<UInt32> m_converter;
 		private static StringBuilder m_stringRepresentation;
 
+		private static readonly Dictionary<int, OmgNum> s_constants = new Dictionary<int, OmgNum>();
+
 		public bool IsNegative { get; internal set; }
 		internal RawNum Raw { get; private set; }
 		public bool IsValid => Raw != null;
@@ -19,6 +21,17 @@ namespace SizeDoesNotMatter {
 			m_converter.Output = new List<UInt32>();
 
 			m_stringRepresentation = new StringBuilder();
+		}
+
+		public static OmgNum GetConst( int num ) {
+			if( s_constants.TryGetValue( num, out OmgNum omg )) {
+				return omg;
+			}
+
+			omg = num.ToOmgNum();
+			s_constants.Add(num, omg);
+
+			return omg;
 		}
 
 		internal OmgNum(RawNum raw) {
@@ -52,7 +65,22 @@ namespace SizeDoesNotMatter {
 		}
 
 		public OmgNum Inc() {
-			Raw.Inc();
+			if( IsNegative ) {
+				Raw.Dec();
+			} else {
+				Raw.Inc();
+			}
+			
+			return this;
+		}
+
+		public OmgNum Dec() {
+			if (IsNegative) {
+				Raw.Inc();
+			} else {
+				Raw.Dec();
+			}
+
 			return this;
 		}
 

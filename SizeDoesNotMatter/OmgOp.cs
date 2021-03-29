@@ -136,6 +136,11 @@ namespace SizeDoesNotMatter {
 			throw new NotImplementedException();
 		}
 
+		public static OmgNum Random( int bitLength ) {
+			if( bitLength < 0 ) { throw new OmgFailException("BitLength can't be less than zero."); }
+			return _Positive(m_randomizer.GenerateWithBitlength(bitLength));
+		}
+
 		public static bool Equal (OmgNum left, OmgNum right) {
 			if( left.IsNegative != right.IsNegative ) {
 				return left.IsZero() && right.IsZero();
