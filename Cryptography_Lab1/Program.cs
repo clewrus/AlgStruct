@@ -17,7 +17,7 @@ namespace Cryptography_Lab1 {
 
 			Console.WriteLine($"base2 : {primes[0].ToString(2)}");
 			Console.WriteLine($"base10: {primes[0].ToString(10)}");
-			Console.WriteLine($"base10: {primes[0].ToString(64)}");
+			Console.WriteLine($"base64: {primes[0].ToString(64)}");
 
 			Console.WriteLine($"base64: {primes[0].EncodeToBase64()}");
 		}

@@ -6,25 +6,26 @@ using System.Text;
 
 namespace Cryptography_Lab1 {
 	public class PrimeGenerator {
+		private int m_testsPerNumber;
 		private MillerRabinTester m_primeTester;
 
-		public PrimeGenerator() {
+		public PrimeGenerator (int testsPerNumber = 64) {
+			m_testsPerNumber = testsPerNumber;
 			m_primeTester = new MillerRabinTester();
 		}
 
-		public OmgNum GeneratePrime( int bitLength ) {
-			if( bitLength < 0 ) {
+		public OmgNum GeneratePrime (int bitLength) {
+			if (bitLength < 0) {
 				return null;
 			}
 
-			if( bitLength == 0 ) {
+			if (bitLength == 0) {
 				return 0.ToOmgNum();
 			}
 
-			int numOfTests = Math.Min(4, bitLength);
 			OmgNum randNum = OmgOp.Random(bitLength);
 
-			while(_TestFailed(randNum, numOfTests)) {
+			while (_TestFailed(randNum)) {
 				randNum.Release();
 				randNum = OmgOp.Random(bitLength);
 			}
@@ -32,15 +33,15 @@ namespace Cryptography_Lab1 {
 			return randNum;
 		}
 
-		private bool _TestFailed(OmgNum num, int numOfTests) {
+		private bool _TestFailed (OmgNum num) {
 			m_primeTester.SetTestedNumber(num.Copy());
 
-			for (int i = 0; i < numOfTests; i++) {
+			for (int i = 0; i < m_testsPerNumber; i++) {
 				OmgNum testBase = OmgOp.Random(OmgNum.GetConst(2), num);
 				bool isPrime = m_primeTester.IsPrimeToBase(testBase);
 				testBase.Release();
 
-				if( !isPrime ) {
+				if (!isPrime) {
 					return true;
 				}
 			}

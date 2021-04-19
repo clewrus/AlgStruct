@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace SizeDoesNotMatter.Internal.Operations {
@@ -9,6 +10,41 @@ namespace SizeDoesNotMatter.Internal.Operations {
 
 
 		private RawNum m_multRaw;
+
+		internal RawNum MultiplyKaratsuba( RawNum left, RawNum right ) {
+			if (left.IsZero() || right.IsZero()) {
+				return OmgPool.GetRawZero();
+			}
+
+			int n = Math.Min(left.Size, right.Size);
+
+			(RawNum head, RawNum tail) leftSep = _SeparateHead(left, n);
+			(RawNum head, RawNum tail) rightSep = _SeparateHead(right, n);
+
+			RawNum headsProd = Multiply(leftSep.head, rightSep.head);
+			RawNum tailsProd = Multiply(leftSep.tail, rightSep.tail);
+
+			RawNum headTail = Multiply(leftSep.head, rightSep.tail);
+			RawNum tailHead = Multiply(leftSep.tail, rightSep.head);
+
+			OmgNum midSum = OmgOp.Add(new OmgNum(headTail), new OmgNum(tailHead));
+
+			m_multRaw = OmgPool.GetRawZero();
+
+			m_multRaw.CopyFrom(tailsProd);
+			midSum.Raw.Digits.InsertRange(0, Enumerable.Repeat<uint>(0, n));
+			headsProd.Digits.InsertRange(0, Enumerable.Repeat<uint>(0, 2*n));
+
+			OmgNum res = OmgOp.Add(new OmgNum(tailsProd), midSum);
+			OmgNum finalRes = OmgOp.Add(new OmgNum(headsProd), res);
+
+			midSum.Release();
+			res.Release();
+			OmgPool.ReleaseNumber(headTail);
+			OmgPool.ReleaseNumber(tailHead);
+
+			return finalRes.Raw;
+		}
 
 		internal RawNum Multiply( RawNum left, RawNum right ) {
 			m_multRaw = OmgPool.GetRawZero();
@@ -168,6 +204,20 @@ namespace SizeDoesNotMatter.Internal.Operations {
 			if (num.Digits[num.Size - 1] == 0) {
 				num.Digits.RemoveAt(num.Size - 1);
 			}
+		}
+
+		private (RawNum head, RawNum tail) _SeparateHead(RawNum num, int n) {
+			(RawNum head, RawNum tail) res = (OmgPool.GetRawZero(), OmgPool.GetRawZero());
+			for (int i = 0; i < num.Size; i++) {
+				if( i < n / 2 ) {
+					res.tail.Digits.Add(num.Digits[i]);
+				}
+				else {
+					res.head.Digits.Add(num.Digits[i]);
+				}
+			}
+
+			return res;
 		}
 	}
 }
